@@ -1,39 +1,32 @@
 class Solution {
 public:
     vector<int> nodesBetweenCriticalPoints(ListNode* head) {
-        vector<int> nums;
+        vector<int> idx;
 
-        while(head){
-            nums.push_back(head->val);
+        ListNode* prev = NULL;
+        int currIdx = 0;
+        while(head != NULL){
+            if(prev == NULL || head->next == NULL){
+                prev = head;
+                head = head->next;
+                continue;
+            }
+
+            if(head->val > prev->val && head->val > head->next->val) idx.push_back(currIdx);
+            else if(head->val < prev->val && head->val < head->next->val) idx.push_back(currIdx);
+
+            prev = head;
             head = head->next;
+            currIdx++;
         }
 
-        vector<int> criticalPoints;
+        if(idx.size() == 0 || idx.size() == 1) return {-1, -1};
 
-        int n = nums.size();
-
-        for(int i = 1; i < n - 1; i++){
-            if(nums[i] > nums[i - 1] && nums[i] > nums[i + 1]){
-                criticalPoints.push_back(i);
-            }
-            else if(nums[i] < nums[i - 1] && nums[i] < nums[i + 1]){
-                criticalPoints.push_back(i);
-            }
+        int mini = INT_MAX, maxi = INT_MIN;
+        maxi = idx[idx.size() - 1] - idx[0];
+        for(int i = 1; i < idx.size(); i++){
+            mini = min(mini, idx[i] - idx[i - 1]);
         }
-
-        int m = criticalPoints.size();
-
-        if(m < 2) return {-1, -1};
-
-        int minDist = INT_MAX;
-
-        int maxDist = criticalPoints[m - 1] - criticalPoints[0];
-
-        for(int i = 1; i < m; i++){
-            minDist = min(minDist,
-                criticalPoints[i] - criticalPoints[i - 1]);
-        }
-
-        return {minDist, maxDist};
+        return {mini, maxi};
     }
 };
